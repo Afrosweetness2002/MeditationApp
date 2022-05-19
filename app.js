@@ -7,7 +7,7 @@ const app = function () {
   // sounds
   let sounds = document.querySelectorAll(".sound-picker button");
   //Time Display
-  let timeSelect = document.querySelectorAll(".time-select button")
+  let timeSelect = document.querySelectorAll(".time-select button");
   let timeDisplay = document.querySelector(".time-display");
   //Get the length of the outline:
   let outlineLength = outline.getTotalLength();
@@ -17,20 +17,29 @@ const app = function () {
   outline.style.strokeDasharray = outlineLength;
   outline.style.strokeDashoffset = outlineLength;
 
+  // Pick Different sounds
+  sounds.forEach((sound) => {
+    sound.addEventListener("click", function () {
+      song.src = this.getAttribute("data-sound");
+      video.src = this.getAttribute("data-video");
+      checkPlaying(song);
+    });
+  });
+
   //Play Sound
   play.addEventListener("click", function () {
     checkPlaying(song);
   });
 
-
-//Select Sound 
-timeSelect.forEach(option => {
-    option.addEventListener("click", function(){
-        fakeDuration = this.getAttribute("data-time");
-        timeDisplay.textContent = `${Math.floor(fakeDuration / 60)}:${Math.floor(fakeDuration % 60 )}`;
-    })
-
-})
+  //Select Sound
+  timeSelect.forEach((option) => {
+    option.addEventListener("click", function () {
+      fakeDuration = this.getAttribute("data-time");
+      timeDisplay.textContent = `${Math.floor(fakeDuration / 60)}:${Math.floor(
+        fakeDuration % 60
+      )}`;
+    });
+  });
 
   // Create a function specific to stop and play the sounds
   let checkPlaying = (song) => {
@@ -45,21 +54,27 @@ timeSelect.forEach(option => {
     }
   };
 
-
   // We can animate the circle
-  song.ontimeupdate = function(){
-      let currentTime = song.currentTime;
-      let elapsed = fakeDuration - currentTime;
-      let seconds = Math.floor(elapsed % 60);
-      let minutes = Math.floor(elapsed / 60);
+  song.ontimeupdate = function () {
+    let currentTime = song.currentTime;
+    let elapsed = fakeDuration - currentTime;
+    let seconds = Math.floor(elapsed % 60);
+    let minutes = Math.floor(elapsed / 60);
 
-      // animate the Circle
-      let progress = outlineLength - (currentTime / fakeDuration) * outlineLength; 
-      outline.style.strokeDashoffset = progress; 
+    // animate the Circle
+    let progress = outlineLength - (currentTime / fakeDuration) * outlineLength;
+    outline.style.strokeDashoffset = progress;
 
-      //Animate the textAlign: 
-      timeDisplay.textContent = `${minutes}:${seconds}`;
-  }
+    //Animate the textAlign:
+    timeDisplay.textContent = `${minutes}:${seconds}`;
+
+    if (currentTime >= fakeDuration) {
+      song.pause();
+      song.currentTime = 0;
+      play.src = `./svg/play.svg`;
+      video.pause();
+    }
+  };
 };
 
 app();
